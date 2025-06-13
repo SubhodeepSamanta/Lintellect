@@ -1,33 +1,55 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import "prismjs/themes/prism-tomorrow.css"
+import prism from "prismjs"
+import Editor from "react-simple-code-editor"
+import Markdown from "react-markdown"
+import rehypeHighlight from "prismjs/themes/prism-tomorrow.css";
+import "highlight.js/styles/github-dark.css";
+import axios from 'axios'
 import './App.css'
+import { useEffect } from 'react'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [code,setCode]= useState('');
+  const [review,setReview]= useState('');
+
+  useEffect(()=>{
+    prism.highlightAll();
+  },[])
+
+  const reviewCode= ()=>{
+    const response= axios.post('http://localhost:5600/ai/code-review',{code});
+    setReview(response.data);
+  }
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <main>
+        <div className="left">
+          <div className="code">
+            <Editor 
+            value={code}
+            onValueChange={c => setCode(c)}
+            highlight={code=> prism.highlight(code,prism.languages.javascript,"javascript")}
+            padding={10}
+            style={{
+                fontFamily: '"Fira code", "Fira Mono", monospace',
+                fontSize: 16,
+                border: "1px solid #ddd",
+                borderRadius: "5px",
+                height: "100%",
+                width: "100%"
+            }}
+            />
+          </div>
+          <div className='review' onClick={reviewCode}>Review</div>
+        </div>
+        <div className="right">
+          <Markdown rehypePlugins={[rehypeHighlight]}>
+            {review}
+          </Markdown>
+        </div>
+      </main>
     </>
   )
 }
