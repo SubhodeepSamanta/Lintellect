@@ -1,24 +1,27 @@
 import { useState } from 'react'
 import "prismjs/themes/prism-tomorrow.css"
 import prism from "prismjs"
+import "prismjs/components/prism-javascript";
 import Editor from "react-simple-code-editor"
 import Markdown from "react-markdown"
-import rehypeHighlight from "prismjs/themes/prism-tomorrow.css";
-import "highlight.js/styles/github-dark.css";
+import rehypeHighlight from "rehype-highlight";
+import 'highlight.js/styles/github-dark.css'; 
 import axios from 'axios'
 import './App.css'
 import { useEffect } from 'react'
 
 function App() {
-  const [code,setCode]= useState('');
+  const [code,setCode]= useState(` function sum() {
+  return 1 + 1
+}`);
   const [review,setReview]= useState('');
 
   useEffect(()=>{
     prism.highlightAll();
   },[])
 
-  const reviewCode= ()=>{
-    const response= axios.post('http://localhost:5600/ai/code-review',{code});
+  const reviewCode= async ()=>{
+    const response= await axios.post('http://localhost:5600/ai/code-review',{code});
     setReview(response.data);
   }
 
@@ -35,7 +38,7 @@ function App() {
             style={{
                 fontFamily: '"Fira code", "Fira Mono", monospace',
                 fontSize: 16,
-                border: "1px solid #ddd",
+                border: "1px solid gray",
                 borderRadius: "5px",
                 height: "100%",
                 width: "100%"
